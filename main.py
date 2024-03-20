@@ -34,7 +34,7 @@ async def read_root():
 async def read_exchange_rates():
     conn = db_pool.getconn()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM exchange_rates WHERE id = 1")
+    cursor.execute("SELECT * FROM exchangerates WHERE id = 1")
     result = cursor.fetchall()
     cursor.close()
     db_pool.putconn(conn)

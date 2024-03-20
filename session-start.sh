@@ -41,4 +41,4 @@ echo "Both scripts have been activated"
 while true; do
     print_system_info
     sleep 60
-done &
+done
