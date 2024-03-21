@@ -57,6 +57,7 @@ async def update_exchange_rates(rates, updatedAt):
 @app.post("/buff2steam")
 async def insert_buff2steam(id, name, buff_min_price, steam_price_cny, steam_price_eur, b_o_ratio, steamUrl, buffUrl, updatedAt):
     global buff2steam
+    buff2steam = {"id": id, "name": name, "buff_min_price": buff_min_price, "steam_price_cny": steam_price_cny, "steam_price_eur": steam_price_eur, "b_o_ratio": b_o_ratio, "steamUrl": steamUrl, "buffUrl": buffUrl, "updatedat": updatedAt}
     conn = db_pool.getconn()
     cursor = conn.cursor()
 
@@ -67,22 +68,17 @@ async def insert_buff2steam(id, name, buff_min_price, steam_price_cny, steam_pri
         "ON CONFLICT (id) DO NOTHING",
         (id, name, buff_min_price, steam_price_cny, steam_price_eur, b_o_ratio, steamUrl, buffUrl, updatedAt)
     )
-    if cursor.rowcount > 0:
-        buff2steam = {"id": id, "name": name, "buff_min_price": buff_min_price, "steam_price_cny": steam_price_cny, "steam_price_eur": steam_price_eur, "b_o_ratio": b_o_ratio, "steamUrl": steamUrl, "buffUrl": buffUrl, "updatedat": updatedAt}
-        conn.commit()
-        cursor.close()
-        db_pool.putconn(conn)
-        return {"response": True}
-    else:
-        # If no rows were affected, rollback the transaction
-        conn.rollback()
-        cursor.close()
-        db_pool.putconn(conn)
-        return {"response": False}
+
+    conn.commit()
+    cursor.close()
+    db_pool.putconn(conn)
+    return {"response": True}
+
 
 @app.post("/steam2buff")
 async def insert_buff2steam(id, asset_id, price, currency, link, float_value, updatedAt):
     global steam2buff
+    steam2buff = {"id": id, "asset_id": asset_id, "price": price, "currency": currency, "link": link, "float_value": float_value, "updatedat": updatedAt}
     conn = db_pool.getconn()
     cursor = conn.cursor()
 
@@ -93,19 +89,12 @@ async def insert_buff2steam(id, asset_id, price, currency, link, float_value, up
         "ON CONFLICT (id) DO NOTHING",
         (id, asset_id, price, currency, link, float_value, updatedAt)
     )
-    
-    if cursor.rowcount > 0:
-        steam2buff = {"id": id, "asset_id": asset_id, "price": price, "currency": currency, "link": link, "float_value": float_value, "updatedat": updatedAt}
-        conn.commit()
-        cursor.close()
-        db_pool.putconn(conn)
-        return {"response": True}
-    else:
-        # If no rows were affected, rollback the transaction
-        conn.rollback()
-        cursor.close()
-        db_pool.putconn(conn)
-        return {"response": False}
+
+    conn.commit()
+    cursor.close()
+    db_pool.putconn(conn)
+    return {"response": True}
+
 
 
 @app.get("/steam2buff")

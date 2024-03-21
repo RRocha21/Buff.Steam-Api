@@ -2,4 +2,4 @@
 
 set -eu
 
-.venv/bin/python3 -m main.py
+.venv/bin/python3 -m main
