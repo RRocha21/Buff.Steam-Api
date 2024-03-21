@@ -5,6 +5,8 @@ import uvicorn
 
 db_pool = None
 app = FastAPI()
+steam2buff = {}
+buff2steam = {}
 
 def create_db_pool():
     global db_pool
@@ -54,6 +56,7 @@ async def update_exchange_rates(rates, updatedAt):
 
 @app.post("/buff2steam")
 async def insert_buff2steam(id, name, buff_min_price, steam_price_cny, steam_price_eur, b_o_ratio, steamUrl, buffUrl, updatedAt):
+    global buff2steam
     conn = db_pool.getconn()
     cursor = conn.cursor()
 
@@ -64,25 +67,22 @@ async def insert_buff2steam(id, name, buff_min_price, steam_price_cny, steam_pri
         "ON CONFLICT (id) DO NOTHING",
         (id, name, buff_min_price, steam_price_cny, steam_price_eur, b_o_ratio, steamUrl, buffUrl, updatedAt)
     )
-    conn.commit()
-    
-    # Check if the total count exceeds 25, delete the oldest record if necessary
-    cursor.execute(
-        "SELECT COUNT(*) FROM buff2steam"
-    )
-    count = cursor.fetchone()[0]
-    if count > 25:
-        cursor.execute(
-            "DELETE FROM buff2steam WHERE id IN (SELECT id FROM steam2buff ORDER BY updatedat ASC LIMIT 1)"
-        )
+    if cursor.rowcount > 0:
+        buff2steam = {"id": id, "name": name, "buff_min_price": buff_min_price, "steam_price_cny": steam_price_cny, "steam_price_eur": steam_price_eur, "b_o_ratio": b_o_ratio, "steamUrl": steamUrl, "buffUrl": buffUrl, "updatedat": updatedAt}
         conn.commit()
-
-    cursor.close()
-    db_pool.putconn(conn)
-    return {"response": True}
+        cursor.close()
+        db_pool.putconn(conn)
+        return {"response": True}
+    else:
+        # If no rows were affected, rollback the transaction
+        conn.rollback()
+        cursor.close()
+        db_pool.putconn(conn)
+        return {"response": False}
 
 @app.post("/steam2buff")
 async def insert_buff2steam(id, asset_id, price, currency, link, float_value, updatedAt):
+    global steam2buff
     conn = db_pool.getconn()
     cursor = conn.cursor()
 
@@ -93,26 +93,26 @@ async def insert_buff2steam(id, asset_id, price, currency, link, float_value, up
         "ON CONFLICT (id) DO NOTHING",
         (id, asset_id, price, currency, link, float_value, updatedAt)
     )
-    conn.commit()
     
-    # Check if the total count exceeds 25, delete the oldest record if necessary
-    cursor.execute(
-        "SELECT COUNT(*) FROM steam2buff"
-    )
-    count = cursor.fetchone()[0]
-    if count > 25:
-        cursor.execute(
-            "DELETE FROM steam2buff WHERE id IN (SELECT id FROM steam2buff ORDER BY updatedat ASC LIMIT 1)"
-        )
+    if cursor.rowcount > 0:
+        steam2buff = {"id": id, "asset_id": asset_id, "price": price, "currency": currency, "link": link, "float_value": float_value, "updatedat": updatedAt}
         conn.commit()
-
-    cursor.close()
-    db_pool.putconn(conn)
-    return {"response": True}
+        cursor.close()
+        db_pool.putconn(conn)
+        return {"response": True}
+    else:
+        # If no rows were affected, rollback the transaction
+        conn.rollback()
+        cursor.close()
+        db_pool.putconn(conn)
+        return {"response": False}
 
 
 @app.get("/steam2buff")
 async def read_steam2buff():
+    print("Reading steam2buff")
+    global steam2buff
+    steam2buff = {'response': 'True'}
     conn = db_pool.getconn()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM steam2buff")
@@ -133,23 +133,15 @@ async def read_buff2steam():
 
 @app.get("/buff2steam/last")
 async def read_buff2steam_last():
-    conn = db_pool.getconn()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM buff2steam ORDER BY updatedat DESC LIMIT 1")
-    result = cursor.fetchone()
-    cursor.close()
-    db_pool.putconn(conn)
-    return result
+    global buff2steam
+    
+    return buff2steam
 
 @app.get("/steam2buff/last")
 async def read_steam2buff_last():
-    conn = db_pool.getconn()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM steam2buff ORDER BY updatedat DESC LIMIT 1")
-    result = cursor.fetchone()
-    cursor.close()
-    db_pool.putconn(conn)
-    return result
+    global steam2buff
+
+    return steam2buff
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
