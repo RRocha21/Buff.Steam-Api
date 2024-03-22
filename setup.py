@@ -16,6 +16,7 @@ setup(
         'fastapi==0.*',
         'uvicorn==0.*',
         'psycopg2==2.*',
+        'asyncpg==0.*',
     ],
     author='Renato Rocha',
     author_email='renatorocha21@ua.pt',

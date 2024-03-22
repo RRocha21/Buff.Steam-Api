@@ -1,6 +1,7 @@
 import asyncpg
 from fastapi import FastAPI
 import uvicorn
+from datetime import datetime
 
 app = FastAPI()
 pool = None
@@ -41,6 +42,7 @@ async def read_exchange_rates():
 @app.post("/exchange_rates")
 async def update_exchange_rates(rates, updatedAt):
     async with pool.acquire() as conn:
+        updatedAt = datetime.fromisoformat(updatedAt)
         async with conn.transaction():
             await conn.execute("DELETE FROM exchangerates WHERE id = 1")
             await conn.execute("INSERT INTO exchangerates (id,rates, updatedat) VALUES ($1, $2, $3)", 1, rates, updatedAt)
@@ -49,6 +51,7 @@ async def update_exchange_rates(rates, updatedAt):
 @app.post("/buff2steam")
 async def insert_buff2steam(id, name, buff_min_price, steam_price_cny, steam_price_eur, b_o_ratio, steamUrl, buffUrl, updatedAt):
     async with pool.acquire() as conn:
+        updatedAt = datetime.fromisoformat(updatedAt)
         async with conn.transaction():
             await conn.execute(
                 "INSERT INTO buff2steam (id, name, buff_min_price, steam_price_cny, steam_price_eur, b_o_ratio, steamUrl, buffUrl, updatedat) "
@@ -61,6 +64,7 @@ async def insert_buff2steam(id, name, buff_min_price, steam_price_cny, steam_pri
 @app.post("/steam2buff")
 async def insert_buff2steam(id, asset_id, price, currency, link, float_value, updatedAt):
     async with pool.acquire() as conn:
+        updatedAt = datetime.fromisoformat(updatedAt)
         async with conn.transaction():
             await conn.execute(
                 "INSERT INTO steam2buff (id, asset_id, price, currency, link, float_value, updatedat) "
