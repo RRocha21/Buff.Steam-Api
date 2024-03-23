@@ -51,6 +51,7 @@ async def update_exchange_rates(rates, updatedAt):
 @app.post("/buff2steam")
 async def insert_buff2steam(id, name, buff_min_price, steam_price_cny, steam_price_eur, b_o_ratio, steamUrl, buffUrl, updatedAt):
     async with pool.acquire() as conn:
+        id = int(id)
         updatedAt = datetime.fromisoformat(updatedAt)
         async with conn.transaction():
             await conn.execute(
@@ -63,6 +64,8 @@ async def insert_buff2steam(id, name, buff_min_price, steam_price_cny, steam_pri
 @app.post("/steam2buff")
 async def insert_buff2steam(id, asset_id, price, currency, link, float_value, updatedAt):
     async with pool.acquire() as conn:
+        id = int(id)
+        asset_id = int(asset_id)
         updatedAt = datetime.fromisoformat(updatedAt)
         async with conn.transaction():
             await conn.execute(
@@ -94,6 +97,7 @@ async def read_item_nameid(market_hash_name):
 @app.post("/item_nameid")
 async def insert_item_nameid(item_nameid, market_hash_name):
     async with pool.acquire() as conn:
+        item_nameid = int(item_nameid)
         async with conn.transaction():
             await conn.execute(
                 "INSERT INTO item_nameid (item_nameid, market_hash_name) "
