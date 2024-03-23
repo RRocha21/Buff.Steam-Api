@@ -11,7 +11,7 @@ async def connect_to_db():
     pool = await asyncpg.create_pool(
         min_size=1,
         max_size=16,
-        database="buff2steam",
+        database="Buff_Steam",
         user="postgres",
         password="benfica10",
         host="localhost"
@@ -36,7 +36,7 @@ async def read_root():
 @app.get("/exchange_rates")
 async def read_exchange_rates():
     async with pool.acquire() as conn:
-        result = await conn.fetch("SELECT * FROM exchange_rates WHERE id = 1")
+        result = await conn.fetch("SELECT * FROM exchangerates WHERE id = 1")
     return result
 
 @app.post("/exchange_rates")
@@ -55,8 +55,7 @@ async def insert_buff2steam(id, name, buff_min_price, steam_price_cny, steam_pri
         async with conn.transaction():
             await conn.execute(
                 "INSERT INTO buff2steam (id, name, buff_min_price, steam_price_cny, steam_price_eur, b_o_ratio, steamUrl, buffUrl, updatedat) "
-                "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) "
-                "ON CONFLICT (id) DO NOTHING",
+                "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ",
                 id, name, buff_min_price, steam_price_cny, steam_price_eur, b_o_ratio, steamUrl, buffUrl, updatedAt
             )
     return {"response": True}
@@ -85,6 +84,23 @@ async def read_buff2steam():
     async with pool.acquire() as conn:
         result = await conn.fetch("SELECT * FROM buff2steam")
     return result
+
+@app.get("/item_nameid")
+async def read_item_nameid(market_hash_name):
+    async with pool.acquire() as conn:
+        result = await conn.fetch("SELECT * FROM item_nameid WHERE market_hash_name = $1", market_hash_name)
+    return result
+
+@app.post("/item_nameid")
+async def insert_item_nameid(item_nameid, market_hash_name):
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            await conn.execute(
+                "INSERT INTO item_nameid (item_nameid, market_hash_name) "
+                "VALUES ($1, $2) ",
+                item_nameid, market_hash_name
+            )
+    return {"response": True}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
