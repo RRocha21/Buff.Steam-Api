@@ -91,7 +91,7 @@ async def read_buff2steam():
 @app.get("/item_nameid")
 async def read_item_nameid(market_hash_name):
     async with pool.acquire() as conn:
-        result = await conn.fetch("SELECT * FROM item_nameid WHERE market_hash_name = $1", market_hash_name)
+        result = await conn.fetch("SELECT * FROM steamskins WHERE market_hash_name = $1", market_hash_name)
     return result
 
 @app.post("/item_nameid")
@@ -100,7 +100,7 @@ async def insert_item_nameid(item_nameid, market_hash_name):
         item_nameid = int(item_nameid)
         async with conn.transaction():
             await conn.execute(
-                "INSERT INTO item_nameid (item_nameid, market_hash_name) "
+                "INSERT INTO steamskins (item_nameid, market_hash_name) "
                 "VALUES ($1, $2) ",
                 item_nameid, market_hash_name
             )
