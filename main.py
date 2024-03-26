@@ -75,7 +75,7 @@ async def insert_buff2steam(id, price, currency, link, float_value, updatedAt):
         async with conn.transaction():
             await conn.execute(
                 "INSERT INTO steam2buff (id, price, currency, link, float_value, updatedat) "
-                "VALUES ($1, $2, $3, $4, $5, $6) "
+                "VALUES ($1, $2, $3, $4, $5, $6) ",
                 id, price, currency, link, float_value, updatedAt
             )
     return {"response": True}
