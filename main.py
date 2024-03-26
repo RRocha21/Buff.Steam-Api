@@ -66,18 +66,16 @@ async def insert_buff2steam(id, name, buff_min_price, steam_price_cny, steam_pri
     return {"response": True}
 
 @app.post("/steam2buff")
-async def insert_buff2steam(id, asset_id, price, currency, link, float_value, updatedAt):
+async def insert_buff2steam(id, price, currency, link, float_value, updatedAt):
     async with pool.acquire() as conn:
         id = int(id)
-        asset_id = int(asset_id)
         price = float(price)
         float_value = float(float_value)
         updatedAt = datetime.fromisoformat(updatedAt)
         async with conn.transaction():
             await conn.execute(
-                "INSERT INTO steam2buff (id, asset_id, price, currency, link, float_value, updatedat) "
+                "INSERT INTO steam2buff (id, price, currency, link, float_value, updatedat) "
                 "VALUES ($1, $2, $3, $4, $5, $6, $7) "
-                "ON CONFLICT (id) DO NOTHING",
                 id, asset_id, price, currency, link, float_value, updatedAt
             )
     return {"response": True}
@@ -109,6 +107,20 @@ async def insert_item_nameid(item_nameid, market_hash_name):
                 "INSERT INTO steamskins (item_nameid, market_hash_name) "
                 "VALUES ($1, $2) ",
                 item_nameid, market_hash_name
+            )
+    return {"response": True}
+
+@app.post("/purchase/rr")
+async def insert_purchase_rr(market_hash, store, purchase_price, purchase_date, float_value):
+    async with pool.acquire() as conn:
+        purchase_price = float(purchase_price)
+        float_value = float(float_value)
+        purchase_date = datetime.fromisoformat(purchase_date)
+        async with conn.transaction():
+            await conn.execute(
+                "INSERT INTO rr (market_hash, store, purchase_price, purchase_date, float_value) "
+                "VALUES ($1, $2, $3, $4, $5) ",
+                market_hash, store, purchase_price, purchase_date, float_value
             )
     return {"response": True}
 
