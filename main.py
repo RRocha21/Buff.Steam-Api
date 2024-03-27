@@ -83,13 +83,13 @@ async def insert_buff2steam(id, price, currency, link, float_value, updatedAt):
 @app.get("/steam2buff")
 async def read_steam2buff():
     async with pool.acquire() as conn:
-        result = await conn.fetch("SELECT * FROM steam2buff")
+        result = await conn.fetch("SELECT * FROM steam2buff ORDER BY uuid DESC")
     return result
 
 @app.get("/buff2steam")
 async def read_buff2steam():
     async with pool.acquire() as conn:
-        result = await conn.fetch("SELECT * FROM buff2steam")
+        result = await conn.fetch("SELECT * FROM buff2steam ORDER BY uuid DESC")
     return result
 
 @app.get("/item_nameid")
