@@ -181,7 +181,7 @@ async def insert_steam_links(link, max_float, max_price, status):
         max_price = float(max_price)
         async with conn.transaction():
             await conn.execute(
-                "INSERT INTO steamlinks (link) "
+                "INSERT INTO steamlinks (link, maxfloat, maxprice, status) "
                 "VALUES ($1, $2, $3, $4) ",
                 link, max_float, max_price, status
             )
