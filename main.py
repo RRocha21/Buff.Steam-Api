@@ -10,7 +10,7 @@ async def connect_to_db():
     global pool
     pool = await asyncpg.create_pool(
         min_size=1,
-        max_size=16,
+        max_size=32,
         database="Buff_Steam",
         user="postgres",
         password="benfica10",
@@ -33,6 +33,12 @@ async def shutdown_event():
 async def read_root():
     return {"Hello": "World"}
 
+#############################################################################################################################
+###
+### Routes for exchange_rates table
+###
+#############################################################################################################################
+
 @app.get("/exchange_rates")
 async def read_exchange_rates():
     async with pool.acquire() as conn:
@@ -47,6 +53,12 @@ async def update_exchange_rates(rates, updatedAt):
             await conn.execute("DELETE FROM exchangerates WHERE id = 1")
             await conn.execute("INSERT INTO exchangerates (id,rates, updatedat) VALUES ($1, $2, $3)", 1, rates, updatedAt)
     return {"rates": rates, "updatedAt": updatedAt}
+
+#############################################################################################################################
+###
+### Routes for buff2steam and steam2buff tables
+###
+#############################################################################################################################
 
 @app.post("/buff2steam")
 async def insert_buff2steam(id, name, buff_min_price, steam_price_cny, steam_price_eur, b_o_ratio, steamUrl, buffUrl, updatedAt):
@@ -92,6 +104,12 @@ async def read_buff2steam():
         result = await conn.fetch("SELECT * FROM buff2steam ORDER BY uuid DESC")
     return result
 
+#############################################################################################################################
+###
+### Routes for steamskins table
+###
+#############################################################################################################################
+
 @app.get("/item_nameid")
 async def read_item_nameid(market_hash_name):
     async with pool.acquire() as conn:
@@ -110,6 +128,12 @@ async def insert_item_nameid(item_nameid, market_hash_name):
             )
     return {"response": True}
 
+#############################################################################################################################
+###
+### Routes for purchase tables
+###
+#############################################################################################################################
+
 @app.post("/purchase/rr")
 async def insert_purchase_rr(market_hash, store, purchase_price, purchase_date, float_value):
     async with pool.acquire() as conn:
@@ -123,6 +147,51 @@ async def insert_purchase_rr(market_hash, store, purchase_price, purchase_date, 
                 market_hash, store, purchase_price, purchase_date, float_value
             )
     return {"response": True}
+
+@app.get("/purchase/pmcura")
+async def insert_purchase_rr(market_hash, store, purchase_price, purchase_date, float_value):
+    async with pool.acquire() as conn:
+        purchase_price = float(purchase_price)
+        float_value = float(float_value)
+        purchase_date = datetime.fromisoformat(purchase_date)
+        async with conn.transaction():
+            await conn.execute(
+                "INSERT INTO pmcura (market_hash, store, purchase_price, purchase_date, float_value) "
+                "VALUES ($1, $2, $3, $4, $5) ",
+                market_hash, store, purchase_price, purchase_date, float_value
+            )
+    return {"response": True}
+
+#############################################################################################################################
+###
+### Routes for steam links table
+###
+#############################################################################################################################
+
+@app.get("/steam_links")
+async def read_steam_links():
+    async with pool.acquire() as conn:
+        result = await conn.fetch("SELECT * FROM steamlinks ORDER BY RANDOM() LIMIT 20")
+    return result
+
+@app.post("/steam_links")
+async def insert_steam_links(link, float_max, max_price, active):
+    async with pool.acquire() as conn:
+        float_max = float(float_max)
+        max_price = float(max_price)
+        async with conn.transaction():
+            await conn.execute(
+                "INSERT INTO steamlinks (link) "
+                "VALUES ($1, $2, $3, $4) ",
+                link, float_max, max_price, active
+            )
+    return {"response": True}
+
+#############################################################################################################################
+###
+###
+###
+#############################################################################################################################
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
