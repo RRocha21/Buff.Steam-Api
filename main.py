@@ -179,6 +179,10 @@ async def insert_steam_links(link, max_float, max_price, status):
     async with pool.acquire() as conn:
         max_float = float(max_float)
         max_price = float(max_price)
+        if status == "True":
+            status = True
+        else:
+            status = False
         async with conn.transaction():
             await conn.execute(
                 "INSERT INTO steamlinks (link, maxfloat, maxprice, status) "
