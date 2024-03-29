@@ -171,7 +171,7 @@ async def insert_purchase_rr(market_hash, store, purchase_price, purchase_date, 
 @app.get("/steam_links")
 async def read_steam_links():
     async with pool.acquire() as conn:
-        result = await conn.fetch("SELECT * FROM steamlinks WHERE status = True ORDER BY RANDOM() LIMIT 20")
+        result = await conn.fetch("SELECT * FROM steamlinks WHERE status = True ORDER BY RANDOM() LIMIT 10")
     return result
 
 @app.delete("/steam_links")
