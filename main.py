@@ -175,15 +175,15 @@ async def read_steam_links():
     return result
 
 @app.post("/steam_links")
-async def insert_steam_links(link, float_max, max_price, active):
+async def insert_steam_links(link, max_float, max_price, status):
     async with pool.acquire() as conn:
-        float_max = float(float_max)
+        max_float = float(max_float)
         max_price = float(max_price)
         async with conn.transaction():
             await conn.execute(
                 "INSERT INTO steamlinks (link) "
                 "VALUES ($1, $2, $3, $4) ",
-                link, float_max, max_price, active
+                link, max_float, max_price, status
             )
     return {"response": True}
 
