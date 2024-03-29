@@ -174,12 +174,19 @@ async def read_steam_links():
         result = await conn.fetch("SELECT * FROM steamlinks ORDER BY RANDOM() LIMIT 20")
     return result
 
+@app.delete("/steam_links")
+async def delete_steam_links():
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            await conn.execute("DELETE FROM steamlinks")
+    return {"response": True}
+
 @app.post("/steam_links")
 async def insert_steam_links(link, max_float, max_price, status):
     async with pool.acquire() as conn:
         max_float = float(max_float)
         max_price = float(max_price)
-        if status == "True":
+        if status == "TRUE":
             status = True
         else:
             status = False
