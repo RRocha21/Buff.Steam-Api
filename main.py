@@ -149,7 +149,7 @@ async def insert_purchase_rr(market_hash, store, purchase_price, purchase_date, 
     return {"response": True}
 
 @app.get("/purchase/pmcura")
-async def insert_purchase_rr(market_hash, store, purchase_price, purchase_date, float_value):
+async def insert_purchase_pmcura(market_hash, store, purchase_price, purchase_date, float_value):
     async with pool.acquire() as conn:
         purchase_price = float(purchase_price)
         float_value = float(float_value)
