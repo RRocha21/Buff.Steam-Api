@@ -140,6 +140,8 @@ async def insert_purchase_rr(market_hash, store, purchase_price, purchase_date, 
         purchase_price = float(purchase_price)
         float_value = float(float_value)
         purchase_date = datetime.fromisoformat(purchase_date)
+        if store == "buff2steam":
+            float_value = None
         async with conn.transaction():
             await conn.execute(
                 "INSERT INTO rr (market_hash, store, purchase_price, purchase_date, float_value) "
@@ -154,6 +156,8 @@ async def insert_purchase_pmcura(market_hash, store, purchase_price, purchase_da
         purchase_price = float(purchase_price)
         float_value = float(float_value)
         purchase_date = datetime.fromisoformat(purchase_date)
+        if store == "buff2steam":
+            float_value = None
         async with conn.transaction():
             await conn.execute(
                 "INSERT INTO pmcura (market_hash, store, purchase_price, purchase_date, float_value) "
