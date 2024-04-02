@@ -61,19 +61,20 @@ async def update_exchange_rates(rates, updatedAt):
 #############################################################################################################################
 
 @app.post("/buff2steam")
-async def insert_buff2steam(id, name, buff_min_price, steam_price_cny, steam_price_eur, b_o_ratio, steamUrl, buffUrl, updatedAt):
+async def insert_buff2steam(id, name, buff_min_price, buff_min_price_eur, steam_price_cny, steam_price_eur, b_o_ratio, steamUrl, buffUrl, updatedAt):
     async with pool.acquire() as conn:
         id = int(id)
         buff_min_price = float(buff_min_price)
         steam_price_cny = float(steam_price_cny)
         steam_price_eur = float(steam_price_eur)
+        buff_min_price_eur = float(buff_min_price_eur)
         b_o_ratio = float(b_o_ratio)
         updatedAt = datetime.fromisoformat(updatedAt)
         async with conn.transaction():
             await conn.execute(
-                "INSERT INTO buff2steam (id, name, buff_min_price, steam_price_cny, steam_price_eur, b_o_ratio, steamUrl, buffUrl, updatedat) "
-                "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ",
-                id, name, buff_min_price, steam_price_cny, steam_price_eur, b_o_ratio, steamUrl, buffUrl, updatedAt
+                "INSERT INTO buff2steam (id, name, buff_min_price, buff_min_price_eur, steam_price_cny, steam_price_eur, b_o_ratio, steamUrl, buffUrl, updatedat) "
+                "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ",
+                id, name, buff_min_price, buff_min_price_eur, steam_price_cny, steam_price_eur, b_o_ratio, steamUrl, buffUrl, updatedAt
             )
     return {"response": True}
 
