@@ -215,7 +215,7 @@ async def insert_steam_links_search(buffUrl, buffId, skinName, steamUrl, maxFloa
         maxFloat = float(maxFloat)
         async with conn.transaction():
             await conn.execute(
-                "INSERT INTO steamlinks2search (buffurl, buffid, skinname, steamurl, maxfloat) "
+                "INSERT INTO steamlinks2search (buffUrl, buffId, skinName, steamUrl, maxFloat) "
                 "VALUES ($1, $2, $3, $4, $5) ",
                 buffUrl, buffId, skinName, steamUrl, maxFloat
             )
