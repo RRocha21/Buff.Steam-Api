@@ -213,6 +213,7 @@ async def insert_steam_links(link, max_float, max_price, status):
 async def insert_steam_links_search(buffUrl, buffId, skinName, steamUrl, maxFloat):
     async with pool.acquire() as conn:
         maxFloat = float(maxFloat)
+        buffId = int(buffId)
         async with conn.transaction():
             await conn.execute(
                 "INSERT INTO steamlinks2search (buffUrl, buffId, skinName, steamUrl, maxFloat) "
