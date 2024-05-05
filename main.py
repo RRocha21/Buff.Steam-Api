@@ -205,7 +205,31 @@ async def insert_steam_links(link, max_float, max_price, status):
 
 #############################################################################################################################
 ###
+### Routes for steam links for search
 ###
+#############################################################################################################################
+
+@app.post("/steam_links_search")
+async def insert_steam_links_search(buffUrl, buffId, skinName, steamUrl, maxFloat):
+    async with pool.acquire() as conn:
+        maxFloat = float(maxFloat)
+        async with conn.transaction():
+            await conn.execute(
+                "INSERT INTO steamlinks2search (buffurl, buffid, skinname, steamurl, maxfloat) "
+                "VALUES ($1, $2, $3, $4, $5) ",
+                buffUrl, buffId, skinName, steamUrl, maxFloat
+            )
+    return {"response": True}
+
+@app.get("/steam_links_search")
+async def get_steam_links_search():
+    async with pool.acquire() as conn:
+        result = await conn.fetch("SELECT * FROM steamlinks2search WHERE status = True ORDER BY RANDOM() LIMIT 10")
+    return result
+
+#############################################################################################################################
+###
+### 
 ###
 #############################################################################################################################
 
