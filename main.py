@@ -210,15 +210,16 @@ async def insert_steam_links(link, max_float, max_price, status):
 #############################################################################################################################
 
 @app.post("/steam_links_search")
-async def insert_steam_links_search(buffUrl, buffId, skinName, steamUrl, maxFloat):
+async def insert_steam_links_search(buffUrl, buffId, skinName, steamUrl, maxFloat, minFloat):
     async with pool.acquire() as conn:
         maxFloat = float(maxFloat)
+        minFloat = float(minFloat)
         buffId = int(buffId)
         async with conn.transaction():
             await conn.execute(
-                "INSERT INTO steamlinks2search (buffUrl, buffId, skinName, steamUrl, maxFloat) "
-                "VALUES ($1, $2, $3, $4, $5) ",
-                buffUrl, buffId, skinName, steamUrl, maxFloat
+                "INSERT INTO steamlinks2search (buffUrl, buffId, skinName, steamUrl, maxFloat, minFloat) "
+                "VALUES ($1, $2, $3, $4, $5, $6) ",
+                buffUrl, buffId, skinName, steamUrl, maxFloat, minFloat
             )
     return {"response": True}
 
