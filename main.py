@@ -187,21 +187,44 @@ async def delete_steam_links():
     return {"response": True}
 
 @app.post("/steam_links")
-async def insert_steam_links(link, max_float, max_price, status):
+async def insert_or_update_steam_links(link, max_float, max_price, status, buff_id):
     async with pool.acquire() as conn:
         max_float = float(max_float)
         max_price = float(max_price)
+        buff_id = int(buff_id)
         if status == "TRUE":
             status = True
         else:
             status = False
+
         async with conn.transaction():
-            await conn.execute(
-                "INSERT INTO steamlinks (link, maxfloat, maxprice, status) "
-                "VALUES ($1, $2, $3, $4) ",
-                link, max_float, max_price, status
+            # Check if a row with the given buff_id exists
+            existing_row = await conn.fetchrow(
+                "SELECT * FROM steamlinks WHERE buff_id = $1", buff_id
             )
+
+            if existing_row:
+                # If row exists, update max_float and max_price
+                await conn.execute(
+                    "UPDATE steamlinks SET maxfloat = $1, maxprice = $2 WHERE buff_id = $3",
+                    max_float,
+                    max_price,
+                    buff_id,
+                )
+            else:
+                # If row doesn't exist, insert a new row
+                await conn.execute(
+                    "INSERT INTO steamlinks (link, maxfloat, maxprice, status, buff_id) "
+                    "VALUES ($1, $2, $3, $4, $5)",
+                    link,
+                    max_float,
+                    max_price,
+                    status,
+                    buff_id,
+                )
+
     return {"response": True}
+
 
 #############################################################################################################################
 ###
