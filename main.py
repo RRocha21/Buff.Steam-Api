@@ -200,13 +200,13 @@ async def insert_or_update_steam_links(link, max_float, max_price, status, buff_
         async with conn.transaction():
             # Check if a row with the given buff_id exists
             existing_row = await conn.fetchrow(
-                "SELECT * FROM steamlinks WHERE buff_id = $1", buff_id
+                "SELECT * FROM steamlinks WHERE buffid = $1", buff_id
             )
 
             if existing_row:
                 # If row exists, update max_float and max_price
                 await conn.execute(
-                    "UPDATE steamlinks SET maxfloat = $1, maxprice = $2 WHERE buff_id = $3",
+                    "UPDATE steamlinks SET maxfloat = $1, maxprice = $2 WHERE buffid = $3",
                     max_float,
                     max_price,
                     buff_id,
@@ -214,7 +214,7 @@ async def insert_or_update_steam_links(link, max_float, max_price, status, buff_
             else:
                 # If row doesn't exist, insert a new row
                 await conn.execute(
-                    "INSERT INTO steamlinks (link, maxfloat, maxprice, status, buff_id) "
+                    "INSERT INTO steamlinks (link, maxfloat, maxprice, status, buffid) "
                     "VALUES ($1, $2, $3, $4, $5)",
                     link,
                     max_float,
