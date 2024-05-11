@@ -192,7 +192,7 @@ async def insert_or_update_steam_links(link, max_float, max_price, status, buff_
         max_float = float(max_float)
         max_price = float(max_price)
         buff_id = int(buff_id)
-        if status == "TRUE":
+        if status == "True":
             status = True
         else:
             status = False
